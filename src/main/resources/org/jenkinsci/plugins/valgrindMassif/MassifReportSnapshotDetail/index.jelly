@@ -1,0 +1,100 @@
+<j:jelly
+  xmlns:j="jelly:core"
+  xmlns:st="jelly:stapler"
+  xmlns:d="jelly:define"
+  xmlns:l="/lib/layout"
+  xmlns:t="/lib/hudson"
+  xmlns:f="/lib/form"
+  xmlns:i="jelly:fmt"
+  xmlns:local="local">
+
+    <l:layout norefresh="true">
+        <st:include it="${it.owner}" page="sidepanel.jelly" />
+        <l:main-panel>
+            <h1>Valgrind Massif Result (Snapshot)</h1>
+
+            <style>
+                .snapshot_row {
+                    cursor: pointer;
+                }
+                .snapshot_row.peak {
+                    background-color: #FF7878;
+                }
+            </style>
+            <j:set var="snapshot" value="${it.snapshot}" />
+            <h2>Summary</h2>
+            <dl>
+                <dt>Snapshot ID</dt>
+                    <dd>${snapshot.snapshotID}</dd>
+                <dt>Time</dt>
+                    <dd>${snapshot.time}</dd>
+                <j:if test="${snapshot.isDetailed}">
+                <dt>Memory Usage</dt>
+                    <dd>
+                        <dl>
+                            <dt>Total</dt>
+                                <dd>${snapshot.memoryHeap + snapshot.memoryHeapExtra + snapshot.memoryStacks}</dd>
+                            <dt>Detail</dt>
+                                <dd>
+                                    <dl>
+                                        <dt>Heap</dt>
+                                            <dd>${snapshot.memoryHeap} bytes</dd>
+                                        <dt>Heap Extra</dt>
+                                            <dd>${snapshot.memoryHeapExtra} bytes</dd>
+                                        <dt>Stacks</dt>
+                                            <dd>${snapshot.memoryStacks} bytes</dd>
+                                    </dl>
+                                </dd>
+                        </dl>
+                    </dd>
+                </j:if>
+            </dl>
+            <h2>Heap Trace</h2>
+            <style>
+                .expand_row, .foldPane {
+                    cursor: pointer;
+                }
+                .expander {
+                    width: 10px;
+                }
+                table.pane > tbody > tr > td:last-child {
+                    padding: 0;
+                }
+                table.pane > tbody > tr > td:last-child {
+                    border-right: 0;
+                    border-bottom: 0;
+                }
+                table.pane table.pane {
+                    margin: 0;
+                    border: none;
+                }
+                .folded {
+                    display: none;
+                }
+                .foldPane {
+                    text-align: center;
+                }
+            </style>
+            <script>
+                <![CDATA[
+                function toggleChild(e, applyToSelf) {
+                    var element = e.srcElement;
+                    while(element.tagName.toUpperCase() != "TR") { element = element.parentElement; }
+                    window.testValue = element;
+                    var children = element.nextSiblings();
+                    for (i = 0; i < children.length; ++i) {
+                        children[i].classList.toggle('folded');
+                    }
+                    if (applyToSelf) {
+                        element.classList.toggle('folded');
+                    }
+                    e.stopPropagation();
+                }
+                ]]>
+            </script>
+            <j:set var="heapDepth" value="0" />
+            <j:set var="heapNode" value="${snapshot.root}" />
+            <st:include page="/org/jenkinsci/plugins/massifReporter/MassifReportSnapshotDetail/heapNode.jelly" />
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

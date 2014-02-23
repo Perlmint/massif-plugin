@@ -1,0 +1,66 @@
+<j:jelly
+  xmlns:j="jelly:core"
+  xmlns:st="jelly:stapler"
+  xmlns:d="jelly:define"
+  xmlns:l="/lib/layout"
+  xmlns:t="/lib/hudson"
+  xmlns:f="/lib/form"
+  xmlns:i="jelly:fmt"
+  xmlns:local="local">
+
+    <l:layout norefresh="true">
+        <st:include it="${it.owner}" page="sidepanel.jelly" />
+        <l:main-panel>
+            <h1>Valgrind Massif Result (Processes Overview)</h1>
+
+            <style>
+                .report_row {
+                    cursor: pointer;
+                }
+            </style>
+            <j:if test="${it.reportsCount == 0}">
+                <i>no report</i>
+            </j:if>
+
+            <j:if test="${it.reportsCount != 0}">
+                <h2>Summary</h2>
+                <dl>
+                    <dt>Reports Count</dt>
+                        <dd>${it.reportsCount}</dd>
+                    <dt>Average Usage</dt>
+                        <dd>${it.averageMemoryUsage} bytes</dd>
+                </dl>
+                <h2>Reports Summary</h2>
+                <table class="pane sortable" id="files">
+                <tr>
+                    <td class="pane-header">Index</td>
+                    <td class="pane-header" style="width:60%">Description</td>
+                    <td class="pane-header">Snapshot Count</td>
+                    <td class="pane-header">Peak Usage</td>
+                </tr>
+                <j:forEach var="report" indexVar="index" items="${it.reports}">
+                    <tr class="report_row" onclick="document.location = './report_${index}'">
+                        <td class="pane" style="vertical-align:top">
+                            ${index}
+                        </td>
+                        <td class="pane" style="vertical-align:top">
+                            ${report.description}
+                        </td>
+                        <td class="pane" style="vertical-align:top">
+                            ${report.snapshotsCount}
+                        </td>
+                        <td class="pane" style="vertical-align:top">
+                          <j:if test="${report.peakUsage == null}">
+                              -
+                          </j:if>
+                          <j:if test="${report.peakUsage != null}">
+                              ${report.peakUsage}
+                          </j:if>
+                        </td>
+                    </tr>
+                </j:forEach>
+                </table>
+            </j:if>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

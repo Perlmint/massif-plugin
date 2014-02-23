@@ -1,0 +1,70 @@
+<j:jelly
+  xmlns:j="jelly:core"
+  xmlns:st="jelly:stapler"
+  xmlns:d="jelly:define"
+  xmlns:l="/lib/layout"
+  xmlns:t="/lib/hudson"
+  xmlns:f="/lib/form"
+  xmlns:i="jelly:fmt"
+  xmlns:local="local">
+    <j:if test="${heapNode == null}">
+    No Heap Trace
+    </j:if>
+    <j:if test="${heapNode != null}">
+    <table class="pane" id="files">
+        <tr>
+            <td class="pane-header"><j:whitespace> </j:whitespace></td>
+            <td class="pane-header">Address</td>
+            <td class="pane-header">Location</td>
+            <td class="pane-header">Bytes</td>
+        </tr>
+        <j:set var="rowClass" value=" " />
+        <j:set var="rowClickHandler" value=" " />
+        <j:if test="${heapNode.children != null}">
+            <j:set var="rowClass" value="expand_row" />
+            <j:set var="rowClickHandler" value="toggleChild(event, false)" />
+        </j:if>
+        <tr class="${rowClass}" onclick="${rowClickHandler}">
+            <td class="expander"><j:whitespace>+</j:whitespace></td>
+            <td class="pane" style="vertical-align:top">
+                ${heapNode.address}
+            </td>
+            <td class="pane" style="vertical-align:top">
+                <j:if test="${heapNode.functionName != null}">${heapNode.functionName} </j:if>
+                <j:if test="${heapNode.fileName != null}">
+                (${heapNode.fileName}
+                <j:if test="${heapNode.lineNumber != null}">:${heapNode.lineNumber}</j:if>
+                )
+                </j:if>
+            </td>
+            <td class="pane" style="vertical-align:top;text-align:right">
+                ${heapNode.bytes} bytes
+            </td>
+        </tr>
+        <j:if test="${heapNode.children != null}">
+        <j:set var="heapDepth" value="${heapDepth + 1}" />
+        <j:set var="foldedClass" value="folded" />
+        <j:set var="unfoldedClass" value=" " />
+        <j:if test="${heapDepth > 1}">
+            <j:set var="foldedClass" value=" " />
+            <j:set var="unfoldedClass" value="folded" />
+        </j:if>
+        <tr class="${foldedClass} foldPane" onclick="toggleChild(event, true)">
+            <td class="pane" colspan="4">
+                ...
+            </td>
+        </tr>
+        <j:forEach var="child" indexVar="index" items="${heapNode.children}">
+        <tr class="${unfoldedClass}">
+            <td></td>
+            <td class="pane" colspan="3">
+            <j:set var="heapNode" value="${child}" />
+            <st:include page="/org/jenkinsci/plugins/massifReporter/MassifReportSnapshotDetail/heapNode.jelly" />
+            </td>
+        </tr>
+        </j:forEach>
+        <j:set var="heapDepth" value="${heapDepth - 1}" />
+        </j:if>
+    </table>
+    </j:if>
+</j:jelly>

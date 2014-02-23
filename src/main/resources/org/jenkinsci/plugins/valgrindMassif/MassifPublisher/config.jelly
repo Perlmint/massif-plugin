@@ -1,0 +1,5 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:entry title="Valgrind Massif Result Pattern" field="resultPattern" value="${instance.massifPublisherConfig.pattern}">
+    <f:textbox />
+  </f:entry>
+</j:jelly>

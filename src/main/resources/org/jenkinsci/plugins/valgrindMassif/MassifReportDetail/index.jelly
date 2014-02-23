@@ -1,0 +1,77 @@
+<j:jelly
+  xmlns:j="jelly:core"
+  xmlns:st="jelly:stapler"
+  xmlns:d="jelly:define"
+  xmlns:l="/lib/layout"
+  xmlns:t="/lib/hudson"
+  xmlns:f="/lib/form"
+  xmlns:i="jelly:fmt"
+  xmlns:local="local">
+
+    <l:layout norefresh="true">
+        <st:include it="${it.owner}" page="sidepanel.jelly" />
+        <l:main-panel>
+            <h1>Valgrind Massif Result (Each Report)</h1>
+
+            <style>
+                .snapshot_row {
+                    cursor: pointer;
+                }
+                .snapshot_row.peak {
+                    background-color: #FF7878;
+                }
+            </style>
+            <j:set var="report" value="${it.report}" />
+            <j:if test="${report.snapshotCount == 0}">
+                <i>no Snapshot</i>
+            </j:if>
+
+            <j:if test="${report.snapshotCount != 0}">
+                <h2>Summary</h2>
+                <dl>
+                    <j:if test="${report.peakSnapshotIndex != null}">
+                    <dt>Peak Snapshot</dt>
+                        <dd>${report.peakSnapshotIndex}</dd>
+                    <dt>Peak Usage</dt>
+                        <dd>${report.peakUsage}</dd>
+                    </j:if>
+                    <dt>Description</dt>
+                        <dd>${report.description}</dd>
+                    <dt>Command</dt>
+                        <dd>${report.command}</dd>
+                    <dt>Graph</dt>
+                        <dd><img src="./graph" width="600" height="240"/></dd>
+                </dl>
+                <h2>Snapshots</h2>
+                <div style="text-align:right">Time Unit : ${report.timeUnit}</div>
+                <table class="pane sortable" id="files">
+                <tr>
+                    <td class="pane-header">Time</td>
+                    <td class="pane-header">Memory Heap</td>
+                    <td class="pane-header">Memory Heap Extra</td>
+                    <td class="pane-header">Memory Stack</td>
+                </tr>
+                <j:forEach var="snapshot" indexVar="index" items="${report.snapshots}">
+                <j:if test="${snapshot.isPeak}"><j:set var="row_class" value="peak" /></j:if>
+                <j:if test="!${snapshot.isPeak}"><j:set var="row_class" value="" /></j:if>
+                <tr class="snapshot_row ${row_class}" onclick="document.location = './snapshot_${index}'">
+                    <td class="pane" style="vertical-align:top">
+                        ${snapshot.time}
+                    </td>
+                    <td class="pane" style="vertical-align:top">
+                        ${snapshot.memoryHeap}
+                    </td>
+                    <td class="pane" style="vertical-align:top">
+                        ${snapshot.memoryHeapExtra}
+                    </td>
+                    <td class="pane" style="vertical-align:top">
+                        ${snapshot.memoryStacks}
+                    </td>
+                </tr>
+                <j:remove var="row_class" />
+                </j:forEach>
+                </table>
+            </j:if>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
